@@ -1,55 +1,66 @@
-import RPi.GPIO as GPIO  # Import the GPIO library to control the Raspberry Pi's pins
-import time  # Import the time library for delays
+import RPi.GPIO as GPIO
+import time
 
-# Define pin numbers for each input and output
-transmit_pin = 12  # Pin that receives the transmission signal
-D_pin = 11  # Pin corresponding to D input on the wireless receiver
-C_pin = 10  # Pin corresponding to C input on the wireless receiver
-B_pin = 9  # Pin corresponding to B input on the wireless receiver
-A_pin = 8  # Pin corresponding to A input on the wireless receiver
-led_pin = 5  # Pin for the LED used for feedback
+# GPIO Pin assignments for controlling Bescor MP-101 movements
+up_pin = 17       # GPIO pin connected to the "Up" control of Bescor MP-101
+down_pin = 27     # GPIO pin connected to the "Down" control of Bescor MP-101
+left_pin = 22     # GPIO pin connected to the "Left" control of Bescor MP-101
+right_pin = 23    # GPIO pin connected to the "Right" control of Bescor MP-101
+speed_pin = 18    # GPIO pin used for controlling the "Speed" with PWM
 
-# Set up GPIO mode
-GPIO.setmode(GPIO.BCM)  # Use BCM numbering (refers to GPIO pin numbers)
+# Setup GPIO in BCM, Which means you gotta use the actual pin out of the raspberry pi and not the physical layout
+GPIO.setmode(GPIO.BCM)
 
-# Set up output pins (for outputs that drive the tripod head)
-GPIO.setup(0, GPIO.OUT)
-GPIO.setup(1, GPIO.OUT)
-GPIO.setup(2, GPIO.OUT)
-GPIO.setup(3, GPIO.OUT)
+# Set the movement pins (Up, Down, Left, Right) as output pins
+GPIO.setup([up_pin, down_pin, left_pin, right_pin], GPIO.OUT)
 
-# Set up input pins (for receiving signals from the wireless controller)
-GPIO.setup(A_pin, GPIO.IN)  # Pin A is set as an input pin
-GPIO.setup(B_pin, GPIO.IN)  # Pin B is set as an input pin
-GPIO.setup(C_pin, GPIO.IN)  # Pin C is set as an input pin
-GPIO.setup(D_pin, GPIO.IN)  # Pin D is set as an input pin
+# Set up the speed pin as output for PWM (Pulse Width Modulation)
+GPIO.setup(speed_pin, GPIO.OUT)
 
-# Set up the transmit pin and LED pin
-GPIO.setup(transmit_pin, GPIO.IN)  # Pin to detect transmission signal
-GPIO.setup(led_pin, GPIO.OUT)  # LED pin to give feedback on transmission
+# Initialize PWM on the speed_pin with a frequency of 1 kHz
+pwm = GPIO.PWM(speed_pin, 1000)  # 1000 Hz frequency
+pwm.start(50)  # Start PWM with 50% duty cycle (medium speed)
 
-# The main loop that runs indefinitely
-def loop():
-    while True:
-        # Check the status of the transmit pin
-        transmit_signal = GPIO.input(transmit_pin)  # Read the state of the transmit pin
+# Function to move the tripod head up for a specified duration
+def move_up(duration):
+    GPIO.output(up_pin, GPIO.HIGH)  # Set "Up" pin to HIGH (turn on)
+    time.sleep(duration)            # Keep moving up for the specified duration
+    GPIO.output(up_pin, GPIO.LOW)   # Set "Up" pin to LOW (turn off)
 
-        if transmit_signal == 1:  # If the signal pin is HIGH (indicating a transmission)
-            GPIO.output(led_pin, GPIO.HIGH)  # Turn on the LED for feedback
+# Function to move the tripod head down for a specified duration
+def move_down(duration):
+    GPIO.output(down_pin, GPIO.HIGH)  # Set "Down" pin to HIGH (turn on)
+    time.sleep(duration)              # Keep moving down for the specified duration
+    GPIO.output(down_pin, GPIO.LOW)   # Set "Down" pin to LOW (turn off)
 
-            # Iterate through all input pins (A, B, C, D) to check which is active
-            for pin in [A_pin, B_pin, C_pin, D_pin]:  # Loop through the pins A to D
-                if GPIO.input(pin):  # If the pin is HIGH (indicating a signal)
-                    GPIO.output(pin - 8, GPIO.HIGH)  # Turn on the corresponding output pin
-                    time.sleep(1)  # Wait for one second
-                    GPIO.output(pin - 8, GPIO.LOW)  # Turn the output pin off
+# Function to move the tripod head left for a specified duration
+def move_left(duration):
+    GPIO.output(left_pin, GPIO.HIGH)  # Set "Left" pin to HIGH (turn on)
+    time.sleep(duration)              # Keep moving left for the specified duration
+    GPIO.output(left_pin, GPIO.LOW)   # Set "Left" pin to LOW (turn off)
 
-            GPIO.output(led_pin, GPIO.LOW)  # Turn off the LED after processing
-            transmit_signal = 0  # Reset the transmit signal for the next loop
+# Function to move the tripod head right for a specified duration
+def move_right(duration):
+    GPIO.output(right_pin, GPIO.HIGH)  # Set "Right" pin to HIGH (turn on)
+    time.sleep(duration)               # Keep moving right for the specified duration
+    GPIO.output(right_pin, GPIO.LOW)   # Set "Right" pin to LOW (turn off)
 
-# Start the loop
-if __name__ == "__main__":
-    try:
-        loop()  # Run the main loop
-    except KeyboardInterrupt:
-        GPIO.cleanup()  # Clean up the GPIO settings when the program is interrupted
+# Function to adjust the speed by changing the PWM duty cycle
+# The duty cycle is a percentage (0-100%) where a higher percentage means faster speed
+def adjust_speed(duty_cycle):
+    pwm.ChangeDutyCycle(duty_cycle)  # Change the speed by modifying the duty cycle
+
+# Main program loop to demonstrate movement and speed control
+
+# Main program loop, awaiting movement commands
+try:
+    # You can call movement functions like move_up(), move_down(), etc. with desired duration
+    # For example:
+    # move_up(2)  # Move up for 2 seconds
+    # adjust_speed(75)  # Adjust speed to 75%
+
+    pass  # Placeholder - no movement example, awaiting your commands
+
+finally:
+    # Clean up the GPIO pins to reset them when the program exits or is interrupted
+    GPIO.cleanup()
