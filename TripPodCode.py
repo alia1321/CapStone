@@ -18,9 +18,9 @@ GPIO.setup(LEFT_PIN, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(RIGHT_PIN, GPIO.OUT, initial=GPIO.LOW)
 
 # Commented out speed control until confirmed it's supported
-# GPIO.setup(SPEED_PIN, GPIO.OUT)
-# pwm = GPIO.PWM(SPEED_PIN, 1000)  # 1000 Hz frequency
-# pwm.start(50)  # Start PWM with 50% duty cycle (medium speed)
+GPIO.setup(SPEED_PIN, GPIO.OUT)
+ pwm = GPIO.PWM(SPEED_PIN, 1000)  # 1000 Hz frequency
+ pwm.start(50)  # Start PWM with 50% duty cycle (medium speed)
 
 # Function to move the tripod head up for a specified duration
 def move_up(duration):
