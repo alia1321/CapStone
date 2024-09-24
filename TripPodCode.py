@@ -6,7 +6,7 @@ UP_PIN = 17       # GPIO pin connected to the "Up" control of Bescor MP-101
 DOWN_PIN = 27     # GPIO pin connected to the "Down" control of Bescor MP-101
 LEFT_PIN = 22     # GPIO pin connected to the "Left" control of Bescor MP-101
 RIGHT_PIN = 23    # GPIO pin connected to the "Right" control of Bescor MP-101
-# SPEED_PIN = 18    # GPIO pin used for controlling the "Speed" with PWM (if applicable)
+SPEED_PIN = 18    # GPIO pin used for controlling the "Speed" with PWM (if applicable)
 
 # Setup GPIO in BCM (Broadcom SOC channel) mode
 GPIO.setmode(GPIO.BCM)
@@ -47,8 +47,8 @@ def move_right(duration):
     GPIO.output(RIGHT_PIN, GPIO.LOW)   # Deactivate "Right" movement
 
 # Function to adjust the speed by changing the PWM duty cycle (if applicable)
-# def adjust_speed(duty_cycle):
-#     pwm.ChangeDutyCycle(duty_cycle)  # Change the speed by modifying the duty cycle
+ def adjust_speed(duty_cycle):
+     pwm.ChangeDutyCycle(duty_cycle)  # Change the speed by modifying the duty cycle
 
 # Main program loop to demonstrate movement
 try:
@@ -66,8 +66,8 @@ try:
     move_right(2)
     
     # Adjust speed if supported
-    # print("Adjusting speed to 75%")
-    # adjust_speed(75)
+    print("Adjusting speed to 75%")
+    adjust_speed(75)
 
 except KeyboardInterrupt:
     print("Program interrupted by user.")
